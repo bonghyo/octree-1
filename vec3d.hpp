@@ -13,7 +13,7 @@
 
 class Vec3D {
 public:
-    double x,y,z;
+    double x, y, z;
 
     Vec3D(double x, double y, double z): x(x), y(y), z(z) {};
     Vec3D(): x(0), y(0), z(0) {};
@@ -21,6 +21,13 @@ public:
     inline double length()
     {
         return sqrt( x*x + y*y + z*z );
+    }
+
+    inline void zero()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
     }
 
     inline bool operator==(const Vec3D &rhs)
@@ -69,6 +76,14 @@ public:
         return *this;
     }
 
+    inline Vec3D operator/=(const double fact)
+    {
+        this->x /= fact;
+        this->y /= fact;
+        this->z /= fact;
+        return *this;
+    }
+
     //Dot Product
     inline double operator*(const Vec3D& rhs)
     {
@@ -96,9 +111,17 @@ inline Vec3D operator*(const double fact, const Vec3D& rhs)
 {
     return Vec3D( fact*rhs.x, fact*rhs.y, fact*rhs.z );
 }
+
 inline Vec3D operator*(const Vec3D& lhs, const double fact)
 {
     return Vec3D( fact*lhs.x, fact*lhs.y, fact*lhs.z );
 }
+
+inline Vec3D operator/(const Vec3D& lhs, const double fact)
+{
+    return Vec3D(lhs.x / fact, lhs.y / fact, lhs.z / fact);
+}
+
+
 
 #endif

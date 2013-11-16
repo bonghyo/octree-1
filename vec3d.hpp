@@ -18,25 +18,30 @@ public:
     Vec3D(double x, double y, double z): x(x), y(y), z(z) {};
     Vec3D(): x(0), y(0), z(0) {};
 
-    inline double length()
+    double length() const
     {
         return sqrt( x*x + y*y + z*z );
     }
 
-    inline void zero()
+    double lengthsq() const
+    {
+        return x*x + y*y + z*z;
+    }
+
+    void zero()
     {
         x = 0;
         y = 0;
         z = 0;
     }
 
-    inline bool operator==(const Vec3D &rhs)
+    bool operator==(const Vec3D &rhs) const
     {
         return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
     }
 
     //Vectors add component wise
-    inline Vec3D operator+=(const Vec3D& rhs)
+    Vec3D operator+=(const Vec3D& rhs)
     {
         this->x += rhs.x;
         this->y += rhs.y;
@@ -44,13 +49,13 @@ public:
         return *this;
     }
 
-    Vec3D operator+(const Vec3D& rhs)
+    Vec3D operator+(const Vec3D& rhs) const
     {
         return Vec3D( x + rhs.x, y + rhs.y, z + rhs.z);
     }
 
     //Vectors subtract component wise
-    inline Vec3D operator-=(const Vec3D& rhs)
+    Vec3D operator-=(const Vec3D& rhs)
     {
         this->x -= rhs.x;
         this->y -= rhs.y;
@@ -58,17 +63,12 @@ public:
         return *this;
     }
 
-    Vec3D operator-(const Vec3D& rhs)
-    {
-        return Vec3D( x - rhs.x, y - rhs.y, z - rhs.z);
-    }
-
-    Vec3D operator-()
+    Vec3D operator-() const
     {
         return Vec3D( -x, -y, -z);
     }
 
-    inline Vec3D operator*=(const double fact)
+    Vec3D operator*=(const double fact)
     {
         this->x *= fact;
         this->y *= fact;
@@ -76,7 +76,7 @@ public:
         return *this;
     }
 
-    inline Vec3D operator/=(const double fact)
+    Vec3D operator/=(const double fact)
     {
         this->x /= fact;
         this->y /= fact;
@@ -85,13 +85,13 @@ public:
     }
 
     //Dot Product
-    inline double operator*(const Vec3D& rhs)
+    double operator*(const Vec3D& rhs) const
     {
         return (this->x * rhs.x) + (this->y * rhs.y) + (this->z * rhs.z);
     }
 
     //Vector product
-    inline Vec3D operator^(const Vec3D& rhs)
+    Vec3D operator^(const Vec3D& rhs) const
     {
         return Vec3D( this->y*rhs.z - this->z*rhs.y,
                       this->z*rhs.x - this->x*rhs.z,
@@ -105,23 +105,15 @@ public:
         return os;
     }
 
+
 };
 
-inline Vec3D operator*(const double fact, const Vec3D& rhs)
-{
-    return Vec3D( fact*rhs.x, fact*rhs.y, fact*rhs.z );
-}
+Vec3D operator*(const double fact, const Vec3D& rhs);
 
-inline Vec3D operator*(const Vec3D& lhs, const double fact)
-{
-    return Vec3D( fact*lhs.x, fact*lhs.y, fact*lhs.z );
-}
+Vec3D operator*(const Vec3D& lhs, const double fact);
 
-inline Vec3D operator/(const Vec3D& lhs, const double fact)
-{
-    return Vec3D(lhs.x / fact, lhs.y / fact, lhs.z / fact);
-}
+Vec3D operator/(const Vec3D& lhs, const double fact);
 
-
+Vec3D operator-(const Vec3D& lhs, const Vec3D& rhs);
 
 #endif

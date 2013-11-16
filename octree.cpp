@@ -1,4 +1,5 @@
 #include "octree.hpp"
+#include <cassert>
 
 Octree::Octree(const Vec3D origin,
                const Vec3D halfdim): origin(origin),
@@ -35,9 +36,16 @@ Vec3D Octree::get_com()
     return com;
 }
 
-void Octree::add(double mass, Vec3D pos)
+void Octree::add(double mass, Vec3D& pos)
 {
     com_built = false;
+
+
+    assert( (pos.x < origin.x + halfdim.x) && (pos.x > origin.x - halfdim.x) );
+    assert( (pos.y < origin.y + halfdim.y) && (pos.y > origin.y - halfdim.y) );
+    assert( (pos.z < origin.z + halfdim.z) && (pos.z > origin.z - halfdim.z) );
+
+
 
     if( this->mass == 0 ) {
         this->mass = mass;
@@ -113,20 +121,29 @@ bool Octree::is_leaf()
 
 Vec3D Octree::get_new_origin(int index)
 {
-    return Vec3D( origin.x += halfdim.x * (index&4 ? -0.5 : 0.5 ),
-                  origin.y += halfdim.y * (index&2 ? -0.5 : 0.5 ),
-                  origin.z += halfdim.z * (index&1 ? -0.5 : 0.5 ) );
+    return Vec3D( origin.x + halfdim.x * (index&4 ? -0.5 : 0.5 ),
+                  origin.y + halfdim.y * (index&2 ? -0.5 : 0.5 ),
+                  origin.z + halfdim.z * (index&1 ? -0.5 : 0.5 ) );
 }
 
-Vec3D Octree::get_new_halfdim()
+Vec3D Octree::calc_acc(const Vec3D& pos)
 {
-    return 0.5*halfdim;
-}
+    double node_d = (origin - pos).length();
 
-void Octree::print_children()
-{
-    for(int i = 0 ; i < 8 ; i++) {
-        std::cout << children[i] << " ";
+    if( pos == get_com() ) { return Vec3D(); }
+
+    if( 2. * node_d / halfdim.x > 100.0  || is_leaf() ) { 
+        Vec3D dp = pos - get_com();
+        return -mass * dp / pow(dp.length(), 3.0);
     }
-    std::cout << std::endl;
+
+    Vec3D retval = Vec3D();
+
+    for(int i = 0; i < 8 ; i++ ) {
+        if( children[i] != NULL ) {
+            retval += children[i]->calc_acc(pos);
+        }
+    }
+
+    return retval;
 }

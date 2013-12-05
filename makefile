@@ -1,5 +1,5 @@
 CXX=g++
-CFLAGS= -c -g -O0 -Wall -Wextra -Weffc++ -pedantic
+CFLAGS= -c -g -O3 -Wall -Wextra -Weffc++ -pedantic -pg
 LDFLAGS=
 
 SOURCES=octree.cpp octreetest.cpp vec3d.cpp

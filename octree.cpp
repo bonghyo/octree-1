@@ -6,7 +6,8 @@ Octree::Octree(const Vec3D origin,
                                      halfdim(halfdim),
                                      mass(0.0),
                                      com(Vec3D()),
-                                     com_built(true)
+                                     com_built(true),
+                                     leaf_node(false)
 {
     for(int i = 0 ; i < 8 ; i++)
         children[i] = NULL;
@@ -20,10 +21,9 @@ Octree::~Octree()
     }
 }
 
-Vec3D Octree::get_com()
+inline Vec3D Octree::get_com()
 {
-    if( com_built )
-        return com;
+    if( com_built ) return com;
 
     com.zero();
     for(int i = 0 ; i < 8 ; i++) {
@@ -32,6 +32,7 @@ Vec3D Octree::get_com()
         } 
     }
     com /= mass;
+    com_built = true;
 
     return com;
 }
@@ -40,21 +41,16 @@ void Octree::add(double mass, Vec3D& pos)
 {
     com_built = false;
 
-
-    assert( (pos.x < origin.x + halfdim.x) && (pos.x > origin.x - halfdim.x) );
-    assert( (pos.y < origin.y + halfdim.y) && (pos.y > origin.y - halfdim.y) );
-    assert( (pos.z < origin.z + halfdim.z) && (pos.z > origin.z - halfdim.z) );
-
-
-
     if( this->mass == 0 ) {
         this->mass = mass;
         this->com = pos;
         com_built = true;
+        leaf_node = true;
         return;
     }
 
     if( is_leaf() ) {
+        leaf_node = false;
         int child_index1 = get_child_index(pos);
         int child_index2 = get_child_index(com);
 
@@ -89,7 +85,7 @@ void Octree::add(double mass, Vec3D& pos)
 }
 
 
-int Octree::get_child_index(const Vec3D& pos)
+int Octree::get_child_index(const Vec3D& pos) const
 {
     // Indices are made such that we have
     //   x y z
@@ -110,16 +106,7 @@ int Octree::get_child_index(const Vec3D& pos)
     return index;
 }
 
-bool Octree::is_leaf()
-{
-    for(int i = 0 ; i < 8 ; i++) {
-        if( children[i] != NULL ) 
-            return false;
-    }
-    return true;
-}
-
-Vec3D Octree::get_new_origin(int index)
+Vec3D Octree::get_new_origin(int index) const
 {
     return Vec3D( origin.x + halfdim.x * (index&4 ? -0.5 : 0.5 ),
                   origin.y + halfdim.y * (index&2 ? -0.5 : 0.5 ),
@@ -132,7 +119,8 @@ Vec3D Octree::calc_acc(const Vec3D& pos)
 
     if( pos == get_com() ) { return Vec3D(); }
 
-    if( 2. * node_d / halfdim.x > 100.0  || is_leaf() ) { 
+    if( 2. * node_d / halfdim.x > 20.0  || is_leaf() ) { 
+    //if( is_leaf() ) {
         Vec3D dp = pos - get_com();
         return -mass * dp / pow(dp.length(), 3.0);
     }

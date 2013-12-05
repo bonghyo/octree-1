@@ -12,6 +12,7 @@ class Octree
     double mass;
     Vec3D com;
     bool com_built;
+    bool leaf_node;
 
 
 public:
@@ -24,12 +25,12 @@ public:
     Vec3D calc_acc(const Vec3D& pos);
 
 private:
-    bool is_in_tree(const Vec3D& pos);
-    int get_child_index(const Vec3D& pos);
+    bool is_in_tree(const Vec3D& pos) const;
+    int get_child_index(const Vec3D& pos) const;
 
-    Vec3D get_new_origin(int index);
+    Vec3D get_new_origin(int index) const;
     inline Vec3D get_new_halfdim() { return 0.5*halfdim; }
-    bool is_leaf();
+    inline bool is_leaf() {return leaf_node;}
 };
 
 #endif

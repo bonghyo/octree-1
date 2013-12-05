@@ -26,26 +26,59 @@ Vec3D direct_force(int index, const vector< Vec3D >& pos)
     return retval;
 }
 
+Vec3D find_max_frac_error(vector<Vec3D> f1, vector<Vec3D> f2)
+{
+    vector<Vec3D> frac_errors(f1.size());
+
+    for(int i = 0 ; i < f1.size() ; i++) {
+        frac_errors[i] = (f2[i] - f1[i] ) / f1[i];
+    }
+
+    double maxx = 0.0, maxy = 0.0, maxz = 0.0;
+
+    for(int i = 0 ; i < f1.size() ; i++) {
+        if( abs(frac_errors[i].x) > maxx ) maxx = frac_errors[i].x;
+        if( abs(frac_errors[i].y) > maxy ) maxy = frac_errors[i].y;
+        if( abs(frac_errors[i].z) > maxz ) maxz = frac_errors[i].z;
+    }
+
+    return Vec3D(maxx, maxy, maxz);
+}
+
 int main()
 {
     vector< Vec3D > positions;
+
+    const int Nparts = 100000;
 
     default_random_engine generator;
     generator.seed(123);
     uniform_real_distribution<double> coord_dist(-10.0,10.0);
     Octree o(Vec3D(), Vec3D(10.0, 10.0, 10.0));
 
-    for(unsigned int i = 0 ; i < 1000000 ; i++) {
+    for(unsigned int i = 0 ; i < Nparts ; i++) {
         positions.push_back(Vec3D(coord_dist(generator),
                                   coord_dist(generator),
                                   coord_dist(generator)));
-        cout << i << endl;
         //cout << positions[i] << endl;
         o.add(1.0, positions[i]);
     }
 
-    cout << direct_force(1, positions) << endl;
-    cout << o.calc_acc(positions[1]) << endl;
+    vector< Vec3D > tforces;
+    vector< Vec3D > dforces;
+
+
+    for(int i = 0 ; i < Nparts ; i++) {
+        cout << i << endl;
+        tforces.push_back( o.calc_acc( positions[i] ) );
+        //dforces.push_back(  direct_force(i, positions) );
+
+        cout <<  tforces[i] << endl;
+
+        //cout << (tforces[i] - dforces[i]) / dforces[i] <<  endl;
+    }
+
+
 
     return 0;
 }

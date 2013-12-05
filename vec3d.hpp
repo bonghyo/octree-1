@@ -54,6 +54,11 @@ public:
         return Vec3D( x + rhs.x, y + rhs.y, z + rhs.z);
     }
 
+    Vec3D operator/(const Vec3D& rhs) const
+    {
+        return Vec3D( x / rhs.x, y / rhs.y, z / rhs.z );
+    }
+
     //Vectors subtract component wise
     Vec3D operator-=(const Vec3D& rhs)
     {
@@ -61,6 +66,11 @@ public:
         this->y -= rhs.y;
         this->z -= rhs.z;
         return *this;
+    }
+
+    Vec3D operator-(const Vec3D& rhs) const
+    {
+        return Vec3D(x - rhs.x, y-rhs.y, z-rhs.z);
     }
 
     Vec3D operator-() const
@@ -98,6 +108,16 @@ public:
                       this->x*rhs.y - this->y*rhs.x);
     }
 
+    Vec3D operator/(const double fact) const
+    {
+        return Vec3D(x / fact, y / fact, z / fact);
+    }
+
+    Vec3D operator*(const double fact) const
+    {
+        return Vec3D( fact*x, fact*y, fact*z );
+    }
+
     //Pretty Print vectors.
     friend std::ostream& operator<< (std::ostream& os,const Vec3D& obj)
     {
@@ -110,10 +130,5 @@ public:
 
 Vec3D operator*(const double fact, const Vec3D& rhs);
 
-Vec3D operator*(const Vec3D& lhs, const double fact);
-
-Vec3D operator/(const Vec3D& lhs, const double fact);
-
-Vec3D operator-(const Vec3D& lhs, const Vec3D& rhs);
 
 #endif
